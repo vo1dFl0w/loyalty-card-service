@@ -1,0 +1,291 @@
+openapi: 3.0.0
+info:
+  title: "Specification for auth service"
+  version: 1.0.0
+
+package: api
+generate:
+  std-http-server: true
+  models: true
+output: gen.go
+
+paths:
+  /api/v1/loyalty/create:
+    post:
+      summary: "Method to create new loyalty card."
+      description: "Creates a new loyalty card for new user."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoyaltyCardRequest'
+      responses:
+        '201':
+          description: "Success response with data of created loyalty card"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyCard'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: "Gateway Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/loyalty:
+    get:
+      summary: "Method to get user's loyalty card."
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: "Success to get user loyalty card"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyCard'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: "Gateway Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/loyalty/balance:
+    patch:
+      summary: "Method to update loyalty card balance."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBalanceRequest'
+      responses:
+        '200':
+          description: "Success to update loyalty card balance"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyCard'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: "Gateway Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/loyalty/is_blocked:
+    patch:
+      summary: "Method to block or unblock loyalty card."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIsBlockRequest'
+      responses:
+        '200':
+          description: "Success to update 'is_blocked' field"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyCard'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: "Gateway Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/loyalty/delete:
+    delete:
+      summary: "Method to delete user's loyalty card."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteLoyaltyCardRequest'
+      responses:
+        '204':
+          description: "No content - loyalty card deleted successfully."
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: "Gateway Timeout"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    CreateLoyaltyCardRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+      required:
+        - user_id
+    UpdateBalanceRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: "amount must be > 0.0"
+        user_id:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          enum: [add, withdraw]
+      required:
+        - amount
+        - user_id
+        - mode
+    UpdateIsBlockRequest:
+      type: object
+      properties:
+        is_blocked:
+          type: boolean
+        user_id:
+          type: string
+          format: uuid
+      required:
+        - is_blocked
+        - user_id
+    DeleteLoyaltyCardRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+      required:
+        - user_id
+    
+    LoyaltyCard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426655440000"
+        user_id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426655440000"
+        balance:
+          type: number
+          example: 256.58
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-11-25T12:34:56Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-11-25T12:34:56Z"
+        is_blocked:
+          type: boolean
+          example: false
+      required:
+        - id
+        - user_id
+        - balance
+        - created_at
+        - updated_at
+        - is_blocked
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+      required:
+        - status
+        - message

@@ -1,0 +1,33 @@
+services:
+  api:
+    build: ./
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - migrate
+  db:
+    container_name: db
+    image: postgres:18-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgres/data
+    restart: always
+  migrate:
+    container_name: migrate
+    image: migrate/migrate:latest
+    command: ["-path", "/migrations", "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=${POSTGRES_SSL}", "up"]
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - db
+volumes:
+  db_data:
+    

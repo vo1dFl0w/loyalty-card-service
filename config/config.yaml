@@ -1,0 +1,14 @@
+server:
+  env: "local"
+  http_addr: "0.0.0.0:8080"
+  request_timeout: 5s
+  logger_time_format: "02-01-2006 15:04:05"
+  shutdown_timeout: 5s
+
+postgres:
+  host: "db"
+  port: "5432"
+  username: "admin"
+  password: "admin"
+  dbname: "loyalty-card-db"
+  sslmode: "disable"
